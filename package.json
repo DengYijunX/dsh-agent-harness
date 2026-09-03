@@ -21,7 +21,8 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "build": "tsc -p tsconfig.build.json",
-    "start": "npm run build && node dist/cli.js"
+    "start": "npm run build && node dist/cli.js",
+    "release:check": "npm test && npm run typecheck && npm run build && npm pack --dry-run"
   },
   "devDependencies": {
     "@types/node": "^22.19.0",
