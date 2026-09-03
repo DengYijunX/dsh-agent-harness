@@ -38,7 +38,7 @@ export interface AgentTool {
   name: string
   description: string
   parameters: unknown
-  executionMode?: 'parallel' | 'sequential'
+  executionMode?: 'parallel' | 'sequential' | 'exclusive'
   execute(call: ToolCall, signal: AbortSignal): Promise<ToolResult>
 }
 
@@ -49,6 +49,14 @@ export interface PermissionDecision {
 
 export interface PermissionPolicy {
   check(call: ToolCall, tool: AgentTool): Promise<PermissionDecision>
+}
+
+export interface ApprovalSurface {
+  request(call: ToolCall, tool: AgentTool): Promise<PermissionDecision>
+}
+
+export interface SandboxExecutor {
+  execute(command: string, options: Record<string, unknown>, signal: AbortSignal): Promise<{ stdout: string; stderr: string; exitCode: number }>
 }
 
 export type AgentEvent =

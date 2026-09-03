@@ -37,7 +37,8 @@ async function executeToolCalls(registry: ToolRegistry, calls: ToolCall[], signa
   }
 
   for (const call of calls) {
-    if (registry.get(call.name)?.executionMode === 'sequential') {
+    const executionMode = registry.get(call.name)?.executionMode
+    if (executionMode === 'sequential' || executionMode === 'exclusive') {
       await flushParallel()
       results.push(await registry.execute(call, signal))
     } else {

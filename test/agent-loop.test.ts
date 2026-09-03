@@ -123,4 +123,39 @@ describe('minimum real-chain contract', () => {
 
     expect(maxActive).toBe(2)
   })
+
+  it('keeps an exclusive tool outside parallel batches', async () => {
+    const session = new MemorySession()
+    const model = new FakeModel([
+      { type: 'tool_call', id: 'call-read', name: 'read', arguments: {} },
+      { type: 'tool_call', id: 'call-write', name: 'write', arguments: {} },
+      { type: 'tool_call', id: 'call-read-2', name: 'read', arguments: {} },
+      { type: 'text_delta', text: 'done' },
+      { type: 'turn_end' },
+    ])
+    let active = 0
+    let maxActive = 0
+    const makeTool = (name: string, executionMode?: AgentTool['executionMode']): AgentTool => ({
+      name,
+      description: name,
+      parameters: {},
+      ...(executionMode ? { executionMode } : {}),
+      execute: async (call: ToolCall, _signal: AbortSignal): Promise<ToolResult> => {
+        active += 1
+        maxActive = Math.max(maxActive, active)
+        await new Promise((resolve) => setTimeout(resolve, 10))
+        active -= 1
+        return { id: call.id, name: call.name, content: name }
+      },
+    })
+
+    await runAgentTurn({
+      model,
+      session,
+      tools: [makeTool('read'), makeTool('write', 'exclusive')],
+      input: 'Read, write, then read.',
+    })
+
+    expect(maxActive).toBe(1)
+  })
 })
