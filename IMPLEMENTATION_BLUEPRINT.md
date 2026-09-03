@@ -46,11 +46,11 @@ CLI / SDK / RPC
 
 ## 当前阶段
 
-阶段二已完成：DSH Service/Fiber 装配、核心依赖固定、Loader/Schema、Include/YAML、CLI、可安装 tarball、Tool Registry/Permission Policy、Concurrency Gate、Approval/Sandbox、受控写文件和 Shell、可配置危险工具、审批记忆、JSONL 审批、审批 Scope、真实沙箱测试、结构化审计事件和 Context Projection 均已具备；下一步补齐 Resume 完整性与历史压缩。
+阶段二已完成：DSH Service/Fiber 装配、核心依赖固定、Loader/Schema、Include/YAML、CLI、可安装 tarball、Tool Registry/Permission Policy、Concurrency Gate、Approval/Sandbox、受控写文件和 Shell、可配置危险工具、审批记忆、JSONL 审批、审批 Scope、真实沙箱测试、结构化审计事件、Context Projection 和 Session Resume 均已具备；下一步补齐 token 级预算、摘要生成和损坏事件恢复。
 
 ## 下一步唯一任务
 
-增加 token budget、历史摘要和损坏事件恢复策略，并补充重新加载 JSONL Session 后继续执行的端到端测试。
+增加 token 级预算、摘要生成器和损坏事件恢复策略；之后进入 SDK / JSON-RPC Surface 与 Rollout 设计。
 
 ## 当前不处理
 
@@ -117,3 +117,4 @@ DEEPSEEK_BASE_URL（可选）
 | 2026-09-03 | 增加审批 Scope 与真实沙箱测试 | 防止授权扩大到不同参数，并验证本地子进程可超时、可取消、可回收 |
 | 2026-09-03 | 增加结构化工具审计事件 | 将请求、权限、完成和失败统一记录，为 Session Resume、Rollout 和 OTel 留出观察边界 |
 | 2026-09-03 | 增加 Context Projection | 将完整 Session 事实转换为有限模型视图，过滤审计事件并截断 Tool Result |
+| 2026-09-03 | 增加 Context Budget 与 Session Resume | 限制模型可见消息数量，支持历史摘要，并验证重新加载 JSONL 后可继续执行 |

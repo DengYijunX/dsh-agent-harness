@@ -19,4 +19,18 @@ describe('ContextProjection', () => {
       { role: 'assistant', content: 'summary' },
     ])
   })
+
+  it('keeps a bounded recent context and prepends a historical summary', () => {
+    const events: AgentEvent[] = [
+      { type: 'user_message', content: 'old question' },
+      { type: 'assistant_message', content: 'old answer' },
+      { type: 'user_message', content: 'current question' },
+    ]
+
+    expect(new ContextProjection({ maxMessages: 2, summary: 'Earlier task was completed.' }).project(events)).toEqual([
+      { role: 'system', content: 'Earlier task was completed.' },
+      { role: 'assistant', content: 'old answer' },
+      { role: 'user', content: 'current question' },
+    ])
+  })
 })
