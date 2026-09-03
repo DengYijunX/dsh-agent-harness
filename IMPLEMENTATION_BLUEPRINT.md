@@ -46,11 +46,11 @@ CLI / SDK / RPC
 
 ## 当前阶段
 
-阶段一：核心真实链路、DSH Service/Fiber 装配、核心依赖固定、Loader/Schema 和 Include/YAML 已完成；下一步增加 CLI 启动入口。
+阶段一：核心真实链路、DSH Service/Fiber 装配、核心依赖固定、Loader/Schema、Include/YAML 和 CLI 已完成；下一步增加构建与 npm 发布配置。
 
 ## 下一步唯一任务
 
-增加 CLI 启动入口：读取 `harness.yml`，调用 Include Bootstrap，暴露一次 Prompt 执行并在退出时销毁 Context。
+增加构建与发布配置：生成可执行 JavaScript、声明 npm `bin`、限制发布文件，并验证打包后安装。
 
 ## 当前不处理
 
@@ -102,3 +102,4 @@ DEEPSEEK_BASE_URL（可选）
 | 2026-09-03 | Vendoring Cordis 与 Cosmokit | 固定 DSH 核心运行时，降低上游预览版变动风险 |
 | 2026-09-03 | 增加 Loader/Schema Bootstrap | 固定启动顺序，并在发布 Agent 前完成配置校验 |
 | 2026-09-03 | 接入 Include/YAML 配置 | 使用 DSH entry-list 加载插件，并覆盖配置失败回滚 |
+| 2026-09-03 | 增加 CLI 启动入口 | 让用户通过 `npm start` 执行一次 Prompt，并自动回收 Context |

@@ -18,12 +18,19 @@ export interface HarnessPluginConfig {
 
 class HarnessRuntime implements AgentRuntime {
   private activeController: AbortController | undefined
+  private readonly model: ModelAdapter
+  private readonly session: SessionStore
+  private readonly tools: AgentTool[]
 
   public constructor(
-    private readonly model: ModelAdapter,
-    private readonly session: SessionStore,
-    private readonly tools: AgentTool[],
-  ) {}
+    model: ModelAdapter,
+    session: SessionStore,
+    tools: AgentTool[],
+  ) {
+    this.model = model
+    this.session = session
+    this.tools = tools
+  }
 
   public async prompt(input: string): Promise<{ text: string; events: AgentEvent[] }> {
     const controller = new AbortController()

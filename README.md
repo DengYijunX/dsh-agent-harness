@@ -25,3 +25,12 @@
 ## 开发入口
 
 先阅读 [IMPLEMENTATION_BLUEPRINT.md](IMPLEMENTATION_BLUEPRINT.md)，再按“下一步唯一任务”推进。
+
+## 运行
+
+在 `.env` 中设置 `DEEPSEEK_API_KEY`，然后执行：
+
+```bash
+npm ci
+npm start -- --prompt "读取 README.md 并用一句话总结项目定位"
+```

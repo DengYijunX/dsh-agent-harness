@@ -1,0 +1,6 @@
+- id: harness
+  name: ./src/dsh/harness-plugin.ts
+  config:
+    modelName: deepseek-chat
+    sessionPath: sessions/default.jsonl
+    workspaceRoot: .
