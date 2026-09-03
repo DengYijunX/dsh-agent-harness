@@ -42,6 +42,15 @@ export interface AgentTool {
   execute(call: ToolCall, signal: AbortSignal): Promise<ToolResult>
 }
 
+export interface PermissionDecision {
+  allowed: boolean
+  reason?: string
+}
+
+export interface PermissionPolicy {
+  check(call: ToolCall, tool: AgentTool): Promise<PermissionDecision>
+}
+
 export type AgentEvent =
   | { type: 'user_message'; content: string }
   | ({ type: 'tool_call' } & ToolCall)

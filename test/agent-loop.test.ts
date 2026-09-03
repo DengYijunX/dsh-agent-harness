@@ -3,6 +3,7 @@ import { runAgentTurn } from '../src/loop/agent-loop.ts'
 import { FakeModel } from '../src/model/fake-model.ts'
 import { MemorySession } from '../src/session/memory-session.ts'
 import { ReadonlyFileTool } from '../src/tools/readonly-file-tool.ts'
+import { ToolRegistry } from '../src/tools/tool-registry.ts'
 
 describe('minimum real-chain contract', () => {
   it('executes a readonly file tool and persists the complete turn', async () => {
@@ -65,6 +66,27 @@ describe('minimum real-chain contract', () => {
       id: 'call-escape',
       isError: true,
       content: 'path escapes the configured root',
+    })
+  })
+
+  it('persists a permission denial as a tool result', async () => {
+    const session = new MemorySession()
+    const model = new FakeModel([
+      { type: 'tool_call', id: 'call-denied', name: 'read_file', arguments: { path: 'notes.txt' } },
+      { type: 'text_delta', text: 'I cannot access that file.' },
+      { type: 'turn_end' },
+    ])
+    const tool = new ReadonlyFileTool({ root: import.meta.dirname, files: new Map([['notes.txt', 'secret']]) })
+    const registry = new ToolRegistry([tool], { check: async () => ({ allowed: false, reason: 'approval required' }) })
+
+    await runAgentTurn({ model, session, tools: [tool], registry, input: 'Read notes.txt.' })
+
+    expect(await session.read()).toContainEqual({
+      type: 'tool_result',
+      id: 'call-denied',
+      name: 'read_file',
+      content: 'approval required',
+      isError: true,
     })
   })
 })

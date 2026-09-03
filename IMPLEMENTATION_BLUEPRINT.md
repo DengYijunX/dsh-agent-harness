@@ -46,11 +46,11 @@ CLI / SDK / RPC
 
 ## 当前阶段
 
-阶段一：核心真实链路、DSH Service/Fiber 装配、核心依赖固定、Loader/Schema、Include/YAML、CLI 和可安装 tarball 已完成；下一步完善 npm 发布文档与版本流程。
+阶段二：DSH Service/Fiber 装配、核心依赖固定、Loader/Schema、Include/YAML、CLI、可安装 tarball，以及 Tool Registry/Permission Policy 边界已完成；正在补齐工具治理的并发、审批和沙箱边界。
 
 ## 下一步唯一任务
 
-完善 npm 发布流程：补充安装文档、版本检查和正式发布前 smoke test；暂不自动发布到 npm。
+加入 Concurrency Gate：只读工具可共享并发，状态修改工具建立 exclusive barrier，并保证结果按模型生成顺序提交。
 
 ## 当前不处理
 
@@ -78,6 +78,8 @@ CLI / SDK / RPC
 - Pi 通过 Adapter 接入，不直接使用完整 `Agent` / `AgentSession`。
 - Tool 不自行决定权限；权限检查发生在执行前。
 - 所有可取消的异步操作接收 `AbortSignal`。
+- Tool Registry 负责查找、权限前置检查、异常归一化，不让具体工具自行决定权限。
+- Agent Loop 只依赖 Registry 的执行契约；以后可替换 Registry、Policy 或底层 Loop 实现。
 
 ## 环境变量
 
@@ -104,3 +106,4 @@ DEEPSEEK_BASE_URL（可选）
 | 2026-09-03 | 接入 Include/YAML 配置 | 使用 DSH entry-list 加载插件，并覆盖配置失败回滚 |
 | 2026-09-03 | 增加 CLI 启动入口 | 让用户通过 `npm start` 执行一次 Prompt，并自动回收 Context |
 | 2026-09-03 | 增加 dist 构建、npm bin 和 tarball 验证 | 验证打包后安装的 CLI 可以正常启动 |
+| 2026-09-03 | 增加 Tool Registry 与 Permission Policy | 将工具查找、权限拒绝和执行异常统一放在 Loop 之外，保留后续替换 Registry/Policy 的边界 |

@@ -16,6 +16,7 @@ describe('HarnessPlugin', () => {
     expect(ctx.get('harnessModel')).toBe(model)
     expect(ctx.get('harnessSession')).toBe(session)
     expect(ctx.get('harnessTools')).toEqual([tool])
+    expect(ctx.get('harnessToolRegistry')).toBeDefined()
     expect(ctx.get('harnessRuntime')).toBeDefined()
     expect(fiber.state).toBe(2)
 
@@ -23,6 +24,7 @@ describe('HarnessPlugin', () => {
     expect(ctx.get('harnessModel')).toBeUndefined()
     expect(ctx.get('harnessSession')).toBeUndefined()
     expect(ctx.get('harnessTools')).toBeUndefined()
+    expect(ctx.get('harnessToolRegistry')).toBeUndefined()
     expect(ctx.get('harnessRuntime')).toBeUndefined()
   })
 })

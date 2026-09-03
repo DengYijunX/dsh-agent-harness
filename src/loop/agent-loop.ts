@@ -5,8 +5,9 @@ import type {
   ModelMessage,
   ModelRequest,
   SessionStore,
-  ToolResult,
+  PermissionPolicy,
 } from '../core/types.ts'
+import { ToolRegistry } from '../tools/tool-registry.ts'
 
 interface RunAgentTurnOptions {
   model: ModelAdapter
@@ -14,6 +15,8 @@ interface RunAgentTurnOptions {
   tools: AgentTool[]
   input: string
   signal?: AbortSignal
+  registry?: ToolRegistry
+  permission?: PermissionPolicy
 }
 
 export interface AgentTurnResult {
@@ -25,7 +28,7 @@ export async function runAgentTurn(options: RunAgentTurnOptions): Promise<AgentT
   const signal = options.signal ?? new AbortController().signal
   await options.session.append({ type: 'user_message', content: options.input })
   const textParts: string[] = []
-  const tools = new Map(options.tools.map((tool) => [tool.name, tool]))
+  const registry = options.registry ?? new ToolRegistry(options.tools, options.permission ?? { check: async () => ({ allowed: true }) })
 
   while (true) {
     const history = await options.session.read()
@@ -49,10 +52,7 @@ export async function runAgentTurn(options: RunAgentTurnOptions): Promise<AgentT
         usedTool = true
         const call = { id: event.id, name: event.name, arguments: event.arguments }
         await options.session.append({ type: 'tool_call', ...call })
-        const tool = tools.get(call.name)
-        const result: ToolResult = tool
-          ? await tool.execute(call, signal)
-          : { id: call.id, name: call.name, content: `unknown tool: ${call.name}`, isError: true }
+        const result = await registry.execute(call, signal)
         await options.session.append({ type: 'tool_result', ...result })
       }
     }
