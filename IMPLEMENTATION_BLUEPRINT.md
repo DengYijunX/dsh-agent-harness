@@ -46,7 +46,7 @@ CLI / SDK / RPC
 
 ## 当前阶段
 
-阶段一：核心真实链路与 DSH Service/Fiber 装配已完成；下一步增加 Loader/配置 Schema。
+阶段一：核心真实链路、DSH Service/Fiber 装配和核心依赖固定已完成；下一步增加 Loader/配置 Schema。
 
 ## 下一步唯一任务
 
@@ -99,3 +99,4 @@ DEEPSEEK_BASE_URL（可选）
 | 2026-09-03 | 接入 JsonlSession | 让事件日志可恢复，并保持 Loop 与存储介质解耦 |
 | 2026-09-03 | 完成真实 DeepSeek 端到端 smoke test | 验证模型、工具、事件日志和最终回答可以真实连通 |
 | 2026-09-03 | 增加 DSH Cordis Plugin 装配层 | 让核心服务由 Context/Fiber 统一注册和销毁 |
+| 2026-09-03 | Vendoring Cordis 与 Cosmokit | 固定 DSH 核心运行时，降低上游预览版变动风险 |

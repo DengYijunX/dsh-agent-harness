@@ -15,3 +15,7 @@ project.
 The root project uses `file:vendor/cordis`, so installation does not resolve a
 new Cordis release from the registry. Cordis's external runtime dependencies
 remain managed by `package-lock.json` and `npm ci`.
+
+`@deepseek-ai/cosmokit@1.8.3` is vendored alongside Cordis because it is a
+runtime dependency of Cordis. Cordis now resolves it through
+`file:../cosmokit`.
