@@ -11,10 +11,18 @@ interface ReadonlyFileToolOptions {
 export class ReadonlyFileTool implements AgentTool {
   public readonly name = 'read_file'
   public readonly description = 'Read a UTF-8 text file inside the configured project root.'
-  public readonly parameters = { type: 'object', required: ['path'] }
+  public readonly parameters = {
+    type: 'object',
+    properties: { path: { type: 'string', description: 'Relative path inside the project root.' } },
+    required: ['path'],
+    additionalProperties: false,
+  }
   public readonly executionMode = 'parallel' as const
+  private readonly options: ReadonlyFileToolOptions
 
-  public constructor(private readonly options: ReadonlyFileToolOptions) {}
+  public constructor(options: ReadonlyFileToolOptions) {
+    this.options = options
+  }
 
   public async execute(call: ToolCall, signal: AbortSignal): Promise<ToolResult> {
     const requestedPath = call.arguments.path

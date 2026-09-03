@@ -46,11 +46,11 @@ CLI / SDK / RPC
 
 ## 当前阶段
 
-阶段一：DeepSeek Model Adapter 与 JSONL Session 已接入并通过协议级测试，下一步进行真实 API 端到端 smoke test。
+阶段一：核心真实链路已完成并通过 DeepSeek API smoke test；下一步把核心服务接入 DSH Service/Fiber 生命周期。
 
 ## 下一步唯一任务
 
-使用 `DEEPSEEK_API_KEY` 运行真实端到端 smoke test：模型请求工具、工具结果写入 JSONL、模型完成并恢复会话。
+建立 DSH Cordis/Loader 装配层：将 Model、Loop、Tool Registry、Session 封装为可等待、可销毁的 Service/Fiber。
 
 ## 当前不处理
 
@@ -97,3 +97,4 @@ DEEPSEEK_BASE_URL（可选）
 | 2026-09-03 | 完成 Fake Model、Agent Loop、MemorySession、ReadonlyFileTool 最小链路 | 先验证模块连接和事件契约，再接真实网络模型 |
 | 2026-09-03 | 接入 DeepSeek SSE Model Adapter | 将真实模型协议隔离在 `ModelAdapter` 边界内 |
 | 2026-09-03 | 接入 JsonlSession | 让事件日志可恢复，并保持 Loop 与存储介质解耦 |
+| 2026-09-03 | 完成真实 DeepSeek 端到端 smoke test | 验证模型、工具、事件日志和最终回答可以真实连通 |

@@ -17,6 +17,8 @@
 - 新实例可从同一文件恢复。
 - 损坏 JSONL 行会报告行号。
 
+核心链路随后已通过真实 DeepSeek smoke test：Tool Call、Tool Result、最终回答均写入同一 JSONL 事件流。
+
 ## 后续
 
 - 将 JSONL Session 接入真实 DeepSeek 端到端链路。

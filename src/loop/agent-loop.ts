@@ -2,6 +2,7 @@ import type {
   AgentEvent,
   AgentTool,
   ModelAdapter,
+  ModelMessage,
   ModelRequest,
   SessionStore,
   ToolResult,
@@ -29,10 +30,13 @@ export async function runAgentTurn(options: RunAgentTurnOptions): Promise<AgentT
   while (true) {
     const history = await options.session.read()
     const request: ModelRequest = {
-      messages: history.flatMap<{ role: 'user' | 'assistant' | 'tool'; content: string }>((event) => {
+      messages: history.flatMap<ModelMessage>((event) => {
         if (event.type === 'user_message') return [{ role: 'user' as const, content: event.content }]
         if (event.type === 'assistant_message') return [{ role: 'assistant' as const, content: event.content }]
-        if (event.type === 'tool_result') return [{ role: 'tool' as const, content: event.content }]
+        if (event.type === 'tool_call') {
+          return [{ role: 'assistant' as const, content: '', tool_calls: [{ id: event.id, name: event.name, arguments: event.arguments }] }]
+        }
+        if (event.type === 'tool_result') return [{ role: 'tool' as const, content: event.content, tool_call_id: event.id }]
         return []
       }),
       tools: options.tools,

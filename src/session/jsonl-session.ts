@@ -3,7 +3,11 @@ import path from 'node:path'
 import type { AgentEvent, SessionStore } from '../core/types.ts'
 
 export class JsonlSession implements SessionStore {
-  public constructor(private readonly filePath: string) {}
+  private readonly filePath: string
+
+  public constructor(filePath: string) {
+    this.filePath = filePath
+  }
 
   public async append(event: AgentEvent): Promise<void> {
     await mkdir(path.dirname(this.filePath), { recursive: true })

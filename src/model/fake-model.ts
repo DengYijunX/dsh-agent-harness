@@ -2,8 +2,11 @@ import type { ModelAdapter, ModelEvent, ModelRequest } from '../core/types.ts'
 
 export class FakeModel implements ModelAdapter {
   public readonly requests: ModelRequest[] = []
+  private readonly scriptedEvents: ModelEvent[]
 
-  public constructor(private readonly scriptedEvents: ModelEvent[]) {}
+  public constructor(scriptedEvents: ModelEvent[]) {
+    this.scriptedEvents = scriptedEvents
+  }
 
   public async *stream(request: ModelRequest, signal: AbortSignal): AsyncIterable<ModelEvent> {
     this.requests.push(request)

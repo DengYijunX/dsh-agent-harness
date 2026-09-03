@@ -35,7 +35,7 @@ export class DeepSeekModel implements ModelAdapter {
       },
       body: JSON.stringify({
         model: this.model,
-        messages: request.messages,
+        messages: request.messages.map(toOpenAIMessage),
         tools: request.tools.map(toOpenAITool),
         stream: true,
       }),
@@ -134,4 +134,22 @@ function toOpenAITool(tool: AgentTool) {
       parameters: tool.parameters,
     },
   }
+}
+
+function toOpenAIMessage(message: ModelRequest['messages'][number]) {
+  if (message.role === 'assistant' && message.tool_calls) {
+    return {
+      role: 'assistant',
+      content: message.content,
+      tool_calls: message.tool_calls.map((call) => ({
+        id: call.id,
+        type: 'function',
+        function: {
+          name: call.name,
+          arguments: JSON.stringify(call.arguments),
+        },
+      })),
+    }
+  }
+  return message
 }

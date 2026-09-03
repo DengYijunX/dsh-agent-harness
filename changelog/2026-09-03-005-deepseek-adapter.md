@@ -19,6 +19,8 @@
 
 当前已完成：文本流、Tool Call、HTTP 错误；结束事件已做幂等处理。
 
+补充：移除 Node 原生 strip-only loader 不支持的 TypeScript 参数属性，使源码可直接由 Node 22 启动。
+
 ## 后续
 
 - 与真实 DeepSeek API 做手工 smoke test。

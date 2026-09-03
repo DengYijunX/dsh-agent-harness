@@ -9,8 +9,12 @@ export interface ToolCall {
   arguments: Record<string, unknown>
 }
 
+export type ModelMessage =
+  | { role: 'user' | 'assistant'; content: string; tool_calls?: ToolCall[] }
+  | { role: 'tool'; content: string; tool_call_id: string }
+
 export interface ModelRequest {
-  messages: Array<{ role: 'user' | 'assistant' | 'tool'; content: string }>
+  messages: ModelMessage[]
   tools: AgentTool[]
 }
 

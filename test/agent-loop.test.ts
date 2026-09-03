@@ -30,6 +30,15 @@ describe('minimum real-chain contract', () => {
     })
 
     expect(result.text).toBe('The file contains the requested note.')
+    expect(model.requests[1]?.messages).toEqual([
+      { role: 'user', content: 'Read notes.txt and summarize it.' },
+      {
+        role: 'assistant',
+        content: '',
+        tool_calls: [{ id: 'call-1', name: 'read_file', arguments: { path: 'notes.txt' } }],
+      },
+      { role: 'tool', content: 'priority: high', tool_call_id: 'call-1' },
+    ])
     expect(await session.read()).toEqual([
       { type: 'user_message', content: 'Read notes.txt and summarize it.' },
       {
