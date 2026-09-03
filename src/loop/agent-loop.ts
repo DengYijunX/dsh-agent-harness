@@ -2,7 +2,6 @@ import type {
   AgentEvent,
   AgentTool,
   ModelAdapter,
-  ModelMessage,
   ModelRequest,
   ToolCall,
   ToolResult,
@@ -10,6 +9,7 @@ import type {
   PermissionPolicy,
 } from '../core/types.ts'
 import { ToolRegistry } from '../tools/tool-registry.ts'
+import { ContextProjection } from '../context/context-projection.ts'
 
 interface RunAgentTurnOptions {
   model: ModelAdapter
@@ -19,6 +19,7 @@ interface RunAgentTurnOptions {
   signal?: AbortSignal
   registry?: ToolRegistry
   permission?: PermissionPolicy
+  context?: ContextProjection
 }
 
 export interface AgentTurnResult {
@@ -54,19 +55,12 @@ export async function runAgentTurn(options: RunAgentTurnOptions): Promise<AgentT
   await options.session.append({ type: 'user_message', content: options.input })
   const textParts: string[] = []
   const registry = options.registry ?? new ToolRegistry(options.tools, options.permission ?? { check: async () => ({ allowed: true }) })
+  const context = options.context ?? new ContextProjection()
 
   while (true) {
     const history = await options.session.read()
     const request: ModelRequest = {
-      messages: history.flatMap<ModelMessage>((event) => {
-        if (event.type === 'user_message') return [{ role: 'user' as const, content: event.content }]
-        if (event.type === 'assistant_message') return [{ role: 'assistant' as const, content: event.content }]
-        if (event.type === 'tool_call') {
-          return [{ role: 'assistant' as const, content: '', tool_calls: [{ id: event.id, name: event.name, arguments: event.arguments }] }]
-        }
-        if (event.type === 'tool_result') return [{ role: 'tool' as const, content: event.content, tool_call_id: event.id }]
-        return []
-      }),
+      messages: context.project(history),
       tools: options.tools,
     }
     let usedTool = false
