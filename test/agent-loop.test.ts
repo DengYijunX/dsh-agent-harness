@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { AgentTool, ToolCall, ToolResult } from '../src/core/types.ts'
 import { runAgentTurn } from '../src/loop/agent-loop.ts'
 import { FakeModel } from '../src/model/fake-model.ts'
 import { MemorySession } from '../src/session/memory-session.ts'
@@ -88,5 +89,38 @@ describe('minimum real-chain contract', () => {
       content: 'approval required',
       isError: true,
     })
+  })
+
+  it('executes independent tool calls in parallel', async () => {
+    const session = new MemorySession()
+    const model = new FakeModel([
+      { type: 'tool_call', id: 'call-a', name: 'read_a', arguments: {} },
+      { type: 'tool_call', id: 'call-b', name: 'read_b', arguments: {} },
+      { type: 'text_delta', text: 'done' },
+      { type: 'turn_end' },
+    ])
+    let active = 0
+    let maxActive = 0
+    const makeTool = (name: string): AgentTool => ({
+      name,
+      description: name,
+      parameters: {},
+      execute: async (call: ToolCall, _signal: AbortSignal): Promise<ToolResult> => {
+        active += 1
+        maxActive = Math.max(maxActive, active)
+        await new Promise((resolve) => setTimeout(resolve, 10))
+        active -= 1
+        return { id: call.id, name: call.name, content: name }
+      },
+    })
+
+    await runAgentTurn({
+      model,
+      session,
+      tools: [makeTool('read_a'), makeTool('read_b')],
+      input: 'Read both files.',
+    })
+
+    expect(maxActive).toBe(2)
   })
 })

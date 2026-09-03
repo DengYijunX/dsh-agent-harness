@@ -46,11 +46,11 @@ CLI / SDK / RPC
 
 ## 当前阶段
 
-阶段二：DSH Service/Fiber 装配、核心依赖固定、Loader/Schema、Include/YAML、CLI、可安装 tarball，以及 Tool Registry/Permission Policy 边界已完成；正在补齐工具治理的并发、审批和沙箱边界。
+阶段二：DSH Service/Fiber 装配、核心依赖固定、Loader/Schema、Include/YAML、CLI、可安装 tarball、Tool Registry/Permission Policy 和 Concurrency Gate 已完成；正在补齐工具治理的审批和沙箱边界。
 
 ## 下一步唯一任务
 
-加入 Concurrency Gate：只读工具可共享并发，状态修改工具建立 exclusive barrier，并保证结果按模型生成顺序提交。
+加入工具执行模式：写文件和 Shell 工具使用 exclusive barrier，并建立 Approval Surface 与 Sandbox Executor 的最小契约。
 
 ## 当前不处理
 
@@ -80,6 +80,7 @@ CLI / SDK / RPC
 - 所有可取消的异步操作接收 `AbortSignal`。
 - Tool Registry 负责查找、权限前置检查、异常归一化，不让具体工具自行决定权限。
 - Agent Loop 只依赖 Registry 的执行契约；以后可替换 Registry、Policy 或底层 Loop 实现。
+- 同一轮普通 Tool Call 并行执行；`executionMode: 'sequential'` 的工具前后建立串行屏障，结果仍按模型生成顺序写入 Session。
 
 ## 环境变量
 
@@ -107,3 +108,4 @@ DEEPSEEK_BASE_URL（可选）
 | 2026-09-03 | 增加 CLI 启动入口 | 让用户通过 `npm start` 执行一次 Prompt，并自动回收 Context |
 | 2026-09-03 | 增加 dist 构建、npm bin 和 tarball 验证 | 验证打包后安装的 CLI 可以正常启动 |
 | 2026-09-03 | 增加 Tool Registry 与 Permission Policy | 将工具查找、权限拒绝和执行异常统一放在 Loop 之外，保留后续替换 Registry/Policy 的边界 |
+| 2026-09-03 | 增加 Concurrency Gate | 独立只读工具并行执行，顺序敏感工具串行执行，降低延迟并保留安全边界 |

@@ -4,6 +4,8 @@ import type {
   ModelAdapter,
   ModelMessage,
   ModelRequest,
+  ToolCall,
+  ToolResult,
   SessionStore,
   PermissionPolicy,
 } from '../core/types.ts'
@@ -22,6 +24,28 @@ interface RunAgentTurnOptions {
 export interface AgentTurnResult {
   text: string
   events: AgentEvent[]
+}
+
+async function executeToolCalls(registry: ToolRegistry, calls: ToolCall[], signal: AbortSignal): Promise<ToolResult[]> {
+  const results: ToolResult[] = []
+  let parallelCalls: ToolCall[] = []
+
+  const flushParallel = async (): Promise<void> => {
+    if (parallelCalls.length === 0) return
+    results.push(...await Promise.all(parallelCalls.map((call) => registry.execute(call, signal))))
+    parallelCalls = []
+  }
+
+  for (const call of calls) {
+    if (registry.get(call.name)?.executionMode === 'sequential') {
+      await flushParallel()
+      results.push(await registry.execute(call, signal))
+    } else {
+      parallelCalls.push(call)
+    }
+  }
+  await flushParallel()
+  return results
 }
 
 export async function runAgentTurn(options: RunAgentTurnOptions): Promise<AgentTurnResult> {
@@ -45,6 +69,7 @@ export async function runAgentTurn(options: RunAgentTurnOptions): Promise<AgentT
       tools: options.tools,
     }
     let usedTool = false
+    const toolCalls: ToolCall[] = []
 
     for await (const event of options.model.stream(request, signal)) {
       if (event.type === 'text_delta') textParts.push(event.text)
@@ -52,12 +77,15 @@ export async function runAgentTurn(options: RunAgentTurnOptions): Promise<AgentT
         usedTool = true
         const call = { id: event.id, name: event.name, arguments: event.arguments }
         await options.session.append({ type: 'tool_call', ...call })
-        const result = await registry.execute(call, signal)
-        await options.session.append({ type: 'tool_result', ...result })
+        toolCalls.push(call)
       }
     }
 
-    if (usedTool) continue
+    if (usedTool) {
+      const results = await executeToolCalls(registry, toolCalls, signal)
+      for (const result of results) await options.session.append({ type: 'tool_result', ...result })
+      continue
+    }
     const text = textParts.join('')
     await options.session.append({ type: 'assistant_message', content: text })
     await options.session.append({ type: 'turn_end' })
