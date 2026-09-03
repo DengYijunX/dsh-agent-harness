@@ -46,11 +46,11 @@ CLI / SDK / RPC
 
 ## 当前阶段
 
-阶段一：核心真实链路已完成并通过 DeepSeek API smoke test；下一步把核心服务接入 DSH Service/Fiber 生命周期。
+阶段一：核心真实链路与 DSH Service/Fiber 装配已完成；下一步增加 Loader/配置 Schema。
 
 ## 下一步唯一任务
 
-建立 DSH Cordis/Loader 装配层：将 Model、Loop、Tool Registry、Session 封装为可等待、可销毁的 Service/Fiber。
+增加 DSH Loader 配置入口和 Schema：启动时校验模型、会话路径、工作区及工具配置，配置失败不发布 Agent。
 
 ## 当前不处理
 
@@ -98,3 +98,4 @@ DEEPSEEK_BASE_URL（可选）
 | 2026-09-03 | 接入 DeepSeek SSE Model Adapter | 将真实模型协议隔离在 `ModelAdapter` 边界内 |
 | 2026-09-03 | 接入 JsonlSession | 让事件日志可恢复，并保持 Loop 与存储介质解耦 |
 | 2026-09-03 | 完成真实 DeepSeek 端到端 smoke test | 验证模型、工具、事件日志和最终回答可以真实连通 |
+| 2026-09-03 | 增加 DSH Cordis Plugin 装配层 | 让核心服务由 Context/Fiber 统一注册和销毁 |

@@ -53,3 +53,8 @@ export interface SessionStore {
   append(event: AgentEvent): Promise<void>
   read(): Promise<AgentEvent[]>
 }
+
+export interface AgentRuntime {
+  prompt(input: string): Promise<{ text: string; events: AgentEvent[] }>
+  abort(): void
+}
