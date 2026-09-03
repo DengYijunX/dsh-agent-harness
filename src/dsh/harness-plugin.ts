@@ -83,7 +83,9 @@ export function HarnessPlugin(ctx: Context, config: HarnessPluginConfig = {}): v
   const rememberedPermission = config.approvalSurface && config.approvalStore
     ? new StoredApprovalPolicy(config.approvalSurface, config.approvalStore)
     : undefined
-  const registry = config.registry ?? new ToolRegistry(tools, config.permission ?? rememberedPermission ?? defaultPermission)
+  const registry = config.registry ?? new ToolRegistry(tools, config.permission ?? rememberedPermission ?? defaultPermission, {
+    emit: async (event) => session.append(event),
+  })
   const runtime = new HarnessRuntime(model, session, tools, registry)
 
   ctx.provide('harnessModel', model)

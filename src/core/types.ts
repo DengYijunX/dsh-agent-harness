@@ -60,6 +60,17 @@ export interface ApprovalStore {
   set(toolName: string, decision: PermissionDecision): Promise<void>
 }
 
+export interface AuditEvent {
+  type: 'audit'
+  category: 'tool' | 'permission' | 'sandbox'
+  name: string
+  data: Record<string, unknown>
+}
+
+export interface AuditSink {
+  emit(event: AuditEvent): Promise<void>
+}
+
 export interface SandboxExecutor {
   execute(command: string, options: Record<string, unknown>, signal: AbortSignal): Promise<{ stdout: string; stderr: string; exitCode: number }>
 }
@@ -70,6 +81,7 @@ export type AgentEvent =
   | ({ type: 'tool_result' } & ToolResult)
   | { type: 'assistant_message'; content: string }
   | { type: 'turn_end' }
+  | AuditEvent
 
 export interface SessionStore {
   append(event: AgentEvent): Promise<void>

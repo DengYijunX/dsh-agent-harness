@@ -40,4 +40,16 @@ describe('ToolRegistry', () => {
 
     expect(result).toEqual({ id: 'call-1', name: 'read_file', content: 'unknown tool: read_file', isError: true })
   })
+
+  it('emits structured audit events around permission and execution', async () => {
+    const events: Array<{ type: string; name: string; data: Record<string, unknown> }> = []
+    const registry = new ToolRegistry([tool()], { check: async () => ({ allowed: true }) }, {
+      emit: async (event) => { events.push(event) },
+    })
+
+    await registry.execute(call, new AbortController().signal)
+
+    expect(events.map((event) => event.name)).toEqual(['tool_requested', 'permission_granted', 'tool_completed'])
+    expect(events[2]?.data).toMatchObject({ toolName: 'read_file', ok: true })
+  })
 })
