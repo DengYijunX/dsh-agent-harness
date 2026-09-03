@@ -59,3 +59,5 @@ export function HarnessPlugin(ctx: Context, config: HarnessPluginConfig = {}): v
   ctx.provide('harnessRuntime', runtime)
   ctx.effect(() => () => runtime.abort(), 'harness.runtime')
 }
+
+export default HarnessPlugin

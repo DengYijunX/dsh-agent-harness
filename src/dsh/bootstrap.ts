@@ -1,6 +1,9 @@
 import { Context } from '@deepseek-ai/cordis'
+import Include from '@deepseek-ai/cordis-plugin-include'
 import Loader from '@deepseek-ai/cordis-plugin-loader'
 import Schema from '@deepseek-ai/schemastery'
+import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 import type { HarnessPluginConfig } from './harness-plugin.ts'
 import { HarnessPlugin } from './harness-plugin.ts'
 
@@ -32,6 +35,23 @@ export async function createHarnessContext(options: HarnessPluginConfig = {}): P
     await loaderFiber.await()
     const harnessFiber = ctx.plugin(HarnessPlugin, { ...options, ...config })
     await harnessFiber.await()
+    return ctx
+  } catch (error) {
+    await ctx.fiber.dispose()
+    throw error
+  }
+}
+
+export async function createHarnessContextFromFile(configPath: string): Promise<Context> {
+  const ctx = new Context()
+  ctx.baseUrl = `${pathToFileURL(path.dirname(configPath)).href}/`
+  try {
+    await ctx.plugin(Loader, {}).await()
+    await ctx.plugin(Include, {
+      path: pathToFileURL(configPath).href,
+      enableLogs: false,
+    }).await()
+    await ctx.get('loader')?.await()
     return ctx
   } catch (error) {
     await ctx.fiber.dispose()
