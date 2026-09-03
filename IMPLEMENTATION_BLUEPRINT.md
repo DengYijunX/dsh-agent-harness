@@ -1,6 +1,7 @@
 # Harness Runtime Implementation Blueprint
 
 > 这是项目内的活文档。每完成一个阶段、改变一个架构决定、出现或解除阻塞时更新；普通代码细节不单独更新。
+commit message格式示例 feat(xx):中文描述
 
 ## 宏观目标
 
@@ -45,11 +46,11 @@ CLI / SDK / RPC
 
 ## 当前阶段
 
-阶段一：最小 Loop 链路已跑通，正在补齐工具安全边界，随后接入真实 DeepSeek。
+阶段一：DeepSeek Model Adapter 已接入并通过协议级测试，下一步接入 JSONL Session。
 
 ## 下一步唯一任务
 
-接入 `DeepSeekModelAdapter`：保持 `ModelAdapter` 不变，用环境变量读取 API 配置，并增加流式文本、Tool Call、错误和取消测试。
+接入 `JsonlSession`：保持 `SessionStore` 不变，支持追加事件、读取事件和损坏日志检测。
 
 ## 当前不处理
 
@@ -94,3 +95,4 @@ DEEPSEEK_BASE_URL（可选）
 |---|---|---|
 | 2026-09-03 | 创建项目蓝图 | 将宏观计划和小步推进计划绑定到独立项目 |
 | 2026-09-03 | 完成 Fake Model、Agent Loop、MemorySession、ReadonlyFileTool 最小链路 | 先验证模块连接和事件契约，再接真实网络模型 |
+| 2026-09-03 | 接入 DeepSeek SSE Model Adapter | 将真实模型协议隔离在 `ModelAdapter` 边界内 |
