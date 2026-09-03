@@ -46,11 +46,11 @@ CLI / SDK / RPC
 
 ## 当前阶段
 
-阶段二：DSH Service/Fiber 装配、核心依赖固定、Loader/Schema、Include/YAML、CLI、可安装 tarball、Tool Registry/Permission Policy、Concurrency Gate、Approval/Sandbox 契约，以及受控写文件和 Shell 工具已完成；下一步将危险工具接入可配置插件装配。
+阶段二：DSH Service/Fiber 装配、核心依赖固定、Loader/Schema、Include/YAML、CLI、可安装 tarball、Tool Registry/Permission Policy、Concurrency Gate、Approval/Sandbox 契约、受控写文件和 Shell 工具，以及可配置危险工具装配已完成；下一步实现交互式审批和沙箱约束。
 
 ## 下一步唯一任务
 
-将 `write_file`、`shell`、ApprovalSurface 和 SandboxExecutor 接入 Harness Plugin 配置，并覆盖审批超时、取消与失败回滚。
+实现交互式 ApprovalSurface、审批状态持久化，以及 SandboxExecutor 的超时、环境白名单和取消回收。
 
 ## 当前不处理
 
@@ -111,3 +111,4 @@ DEEPSEEK_BASE_URL（可选）
 | 2026-09-03 | 增加 Concurrency Gate | 独立只读工具并行执行，顺序敏感工具串行执行，降低延迟并保留安全边界 |
 | 2026-09-03 | 增加 Approval/Sandbox 最小契约 | 为危险工具预留可替换的审批和沙箱边界，并让 exclusive 工具进入串行屏障 |
 | 2026-09-03 | 增加受控写文件与 Shell 工具 | 将危险能力限制在 workspace、SandboxExecutor 和 exclusive 执行边界内，并保留默认只读启动行为 |
+| 2026-09-03 | 增加可配置危险工具装配 | 通过 DSH 配置选择性启用 write_file/shell，默认拒绝危险执行，并保留权限和沙箱注入点 |

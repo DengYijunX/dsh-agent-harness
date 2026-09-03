@@ -1,10 +1,13 @@
 import type { Context } from '@deepseek-ai/cordis'
-import type { AgentEvent, AgentRuntime, AgentTool, ModelAdapter, PermissionPolicy, SessionStore } from '../core/types.ts'
+import type { AgentEvent, AgentRuntime, AgentTool, ModelAdapter, PermissionPolicy, SandboxExecutor, SessionStore } from '../core/types.ts'
 import { runAgentTurn } from '../loop/agent-loop.ts'
 import { DeepSeekModel } from '../model/deepseek-model.ts'
 import { JsonlSession } from '../session/jsonl-session.ts'
 import { ReadonlyFileTool } from '../tools/readonly-file-tool.ts'
 import { ToolRegistry } from '../tools/tool-registry.ts'
+import { ShellTool } from '../tools/shell-tool.ts'
+import { WriteFileTool } from '../tools/write-file-tool.ts'
+import { LocalSandboxExecutor } from '../security/local-sandbox.ts'
 
 export interface HarnessPluginConfig {
   model?: ModelAdapter
@@ -12,6 +15,9 @@ export interface HarnessPluginConfig {
   tools?: AgentTool[]
   registry?: ToolRegistry
   permission?: PermissionPolicy
+  sandbox?: SandboxExecutor
+  enableWriteFile?: boolean
+  enableShell?: boolean
   apiKey?: string
   modelName?: string
   baseUrl?: string
@@ -63,8 +69,15 @@ export function HarnessPlugin(ctx: Context, config: HarnessPluginConfig = {}): v
   if (baseUrl) deepSeekOptions.baseUrl = baseUrl
   const model = config.model ?? new DeepSeekModel(deepSeekOptions)
   const session = config.session ?? new JsonlSession(config.sessionPath ?? 'sessions/default.jsonl')
-  const tools = config.tools ?? [new ReadonlyFileTool({ root: config.workspaceRoot ?? process.cwd() })]
-  const registry = config.registry ?? new ToolRegistry(tools, config.permission ?? { check: async () => ({ allowed: true }) })
+  const workspaceRoot = config.workspaceRoot ?? process.cwd()
+  const sandbox = config.sandbox ?? new LocalSandboxExecutor(workspaceRoot)
+  const tools: AgentTool[] = config.tools ? [...config.tools] : [new ReadonlyFileTool({ root: workspaceRoot })]
+  if (!config.tools && config.enableWriteFile) tools.push(new WriteFileTool({ root: workspaceRoot }))
+  if (!config.tools && config.enableShell) tools.push(new ShellTool({ sandbox }))
+  const defaultPermission: PermissionPolicy = {
+    check: async (_call, tool) => tool.name === 'read_file' ? { allowed: true } : { allowed: false, reason: 'approval required' },
+  }
+  const registry = config.registry ?? new ToolRegistry(tools, config.permission ?? defaultPermission)
   const runtime = new HarnessRuntime(model, session, tools, registry)
 
   ctx.provide('harnessModel', model)

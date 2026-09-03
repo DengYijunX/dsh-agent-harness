@@ -12,6 +12,8 @@ export interface HarnessConfig {
   baseUrl?: string
   sessionPath?: string
   workspaceRoot?: string
+  enableWriteFile?: boolean
+  enableShell?: boolean
 }
 
 export const HarnessConfigSchema = Schema.object({
@@ -19,14 +21,18 @@ export const HarnessConfigSchema = Schema.object({
   baseUrl: Schema.string(),
   sessionPath: Schema.string().default('sessions/default.jsonl'),
   workspaceRoot: Schema.string().default(process.cwd()),
+  enableWriteFile: Schema.boolean().default(false),
+  enableShell: Schema.boolean().default(false),
 })
 
 export async function createHarnessContext(options: HarnessPluginConfig = {}): Promise<Context> {
-  const rawConfig: Record<string, string> = {}
+  const rawConfig: Record<string, string | boolean> = {}
   if (options.modelName) rawConfig.modelName = options.modelName
   if (options.baseUrl) rawConfig.baseUrl = options.baseUrl
   if (options.sessionPath) rawConfig.sessionPath = options.sessionPath
   if (options.workspaceRoot) rawConfig.workspaceRoot = options.workspaceRoot
+  if (options.enableWriteFile !== undefined) rawConfig.enableWriteFile = options.enableWriteFile
+  if (options.enableShell !== undefined) rawConfig.enableShell = options.enableShell
   const config = HarnessConfigSchema(rawConfig)
 
   const ctx = new Context()

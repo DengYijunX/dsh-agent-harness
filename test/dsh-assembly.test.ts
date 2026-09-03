@@ -4,6 +4,7 @@ import { HarnessPlugin } from '../src/dsh/harness-plugin.ts'
 import { FakeModel } from '../src/model/fake-model.ts'
 import { MemorySession } from '../src/session/memory-session.ts'
 import { ReadonlyFileTool } from '../src/tools/readonly-file-tool.ts'
+import type { SandboxExecutor } from '../src/core/types.ts'
 
 describe('HarnessPlugin', () => {
   it('assembles core services and removes them with the owning fiber', async () => {
@@ -26,5 +27,26 @@ describe('HarnessPlugin', () => {
     expect(ctx.get('harnessTools')).toBeUndefined()
     expect(ctx.get('harnessToolRegistry')).toBeUndefined()
     expect(ctx.get('harnessRuntime')).toBeUndefined()
+  })
+
+  it('selectively assembles write and shell tools behind injected governance', async () => {
+    const ctx = new Context()
+    const sandbox: SandboxExecutor = { execute: async () => ({ stdout: '', stderr: '', exitCode: 0 }) }
+    const fiber = await ctx.plugin(HarnessPlugin, {
+      model: new FakeModel([]),
+      session: new MemorySession(),
+      enableWriteFile: true,
+      enableShell: true,
+      sandbox,
+      permission: { check: async () => ({ allowed: false, reason: 'approval required' }) },
+    })
+
+    expect(ctx.get('harnessTools')).toEqual(expect.arrayContaining([
+      expect.objectContaining({ name: 'read_file' }),
+      expect.objectContaining({ name: 'write_file', executionMode: 'exclusive' }),
+      expect.objectContaining({ name: 'shell', executionMode: 'exclusive' }),
+    ]))
+    expect(ctx.get('harnessTools')).toHaveLength(3)
+    await fiber.dispose()
   })
 })
