@@ -17,7 +17,8 @@ describe('JSONL approval persistence', () => {
       const surface = new CallbackApprovalSurface(async () => ({ allowed: true, reason: 'approved for this session' }))
       const policy = new StoredApprovalPolicy(surface, new JsonlApprovalStore(filePath))
       await expect(policy.check(call, tool)).resolves.toEqual({ allowed: true, reason: 'approved for this session' })
-      await expect(new JsonlApprovalStore(filePath).get('write_file')).resolves.toEqual({ allowed: true, reason: 'approved for this session' })
+      await expect(new JsonlApprovalStore(filePath).get('write_file:{"path":"notes.txt"}')).resolves.toEqual({ allowed: true, reason: 'approved for this session' })
+      await expect(new JsonlApprovalStore(filePath).get('shell:other')).resolves.toBeUndefined()
       await expect(readFile(filePath, 'utf8')).resolves.toContain('write_file')
     } finally {
       await rm(directory, { recursive: true, force: true })

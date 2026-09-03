@@ -46,11 +46,11 @@ CLI / SDK / RPC
 
 ## 当前阶段
 
-阶段二：DSH Service/Fiber 装配、核心依赖固定、Loader/Schema、Include/YAML、CLI、可安装 tarball、Tool Registry/Permission Policy、Concurrency Gate、Approval/Sandbox 契约、受控写文件和 Shell 工具、可配置危险工具装配、审批记忆和本地沙箱限制，以及 ApprovalSurface/JSONL 审批装配已完成；下一步补齐审批超时与真实沙箱回收测试。
+阶段二：DSH Service/Fiber 装配、核心依赖固定、Loader/Schema、Include/YAML、CLI、可安装 tarball、Tool Registry/Permission Policy、Concurrency Gate、Approval/Sandbox 契约、受控写文件和 Shell 工具、可配置危险工具装配、审批记忆和本地沙箱限制、ApprovalSurface/JSONL 审批装配，以及审批 Scope 和真实沙箱测试已完成；下一步补充结构化审计事件并进入 Context Projection/Resume。
 
 ## 下一步唯一任务
 
-增加 scope 化审批、审批超时/取消语义，并为 LocalSandboxExecutor 增加真实超时和子进程回收测试。
+增加结构化 tool/approval/sandbox 审计事件，随后实现 Context Projection、历史截断和 Session Resume 完整链路。
 
 ## 当前不处理
 
@@ -114,3 +114,4 @@ DEEPSEEK_BASE_URL（可选）
 | 2026-09-03 | 增加可配置危险工具装配 | 通过 DSH 配置选择性启用 write_file/shell，默认拒绝危险执行，并保留权限和沙箱注入点 |
 | 2026-09-03 | 增加审批记忆与沙箱限制 | 复用审批决策，限制本地命令环境并支持超时和进程取消回收 |
 | 2026-09-03 | 接入 ApprovalSurface 与 JSONL 审批存储 | 让 CLI/SDK 可注入审批回调，并让审批决策跨进程实例恢复 |
+| 2026-09-03 | 增加审批 Scope 与真实沙箱测试 | 防止授权扩大到不同参数，并验证本地子进程可超时、可取消、可回收 |

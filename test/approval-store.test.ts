@@ -12,6 +12,7 @@ describe('StoredApprovalPolicy', () => {
 
     await expect(policy.check(call, tool)).resolves.toEqual({ allowed: true })
     await expect(policy.check({ ...call, id: 'call-2' }, tool)).resolves.toEqual({ allowed: true })
-    expect(surface.request).toHaveBeenCalledOnce()
+    await expect(policy.check({ ...call, id: 'call-3', arguments: { command: 'echo other' } }, tool)).resolves.toEqual({ allowed: true })
+    expect(surface.request).toHaveBeenCalledTimes(2)
   })
 })

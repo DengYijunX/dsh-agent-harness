@@ -2,6 +2,8 @@ import { appendFile, mkdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
 import type { AgentTool, ApprovalStore, ApprovalSurface, PermissionDecision, PermissionPolicy, ToolCall } from '../core/types.ts'
 
+export type ApprovalScopeResolver = (call: ToolCall, tool: AgentTool) => string
+
 export class MemoryApprovalStore implements ApprovalStore {
   private readonly decisions = new Map<string, PermissionDecision>()
 
@@ -53,19 +55,26 @@ export class JsonlApprovalStore implements ApprovalStore {
 export class StoredApprovalPolicy implements PermissionPolicy {
   private readonly surface: ApprovalSurface
   private readonly store: ApprovalStore
+  private readonly resolveScope: ApprovalScopeResolver
 
-  public constructor(surface: ApprovalSurface, store: ApprovalStore) {
+  public constructor(surface: ApprovalSurface, store: ApprovalStore, resolveScope: ApprovalScopeResolver = defaultApprovalScope) {
     this.surface = surface
     this.store = store
+    this.resolveScope = resolveScope
   }
 
   public async check(call: ToolCall, tool: AgentTool): Promise<PermissionDecision> {
-    const remembered = await this.store.get(tool.name)
+    const scope = this.resolveScope(call, tool)
+    const remembered = await this.store.get(scope)
     if (remembered) return remembered
     const decision = await this.surface.request(call, tool)
-    await this.store.set(tool.name, decision)
+    await this.store.set(scope, decision)
     return decision
   }
+}
+
+function defaultApprovalScope(call: ToolCall, tool: AgentTool): string {
+  return `${tool.name}:${JSON.stringify(call.arguments)}`
 }
 
 function isMissingFile(error: unknown): boolean {
