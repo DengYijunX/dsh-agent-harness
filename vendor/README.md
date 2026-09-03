@@ -19,3 +19,10 @@ remain managed by `package-lock.json` and `npm ci`.
 `@deepseek-ai/cosmokit@1.8.3` is vendored alongside Cordis because it is a
 runtime dependency of Cordis. Cordis now resolves it through
 `file:../cosmokit`.
+
+The DSH loader, include plugin, and Schemastery packages are also vendored at
+the versions used by this project:
+
+- `@deepseek-ai/cordis-plugin-loader@1.0.3`
+- `@deepseek-ai/cordis-plugin-include@1.0.7`
+- `@deepseek-ai/schemastery@3.18.2`
