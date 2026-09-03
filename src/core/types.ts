@@ -55,6 +55,11 @@ export interface ApprovalSurface {
   request(call: ToolCall, tool: AgentTool): Promise<PermissionDecision>
 }
 
+export interface ApprovalStore {
+  get(toolName: string): Promise<PermissionDecision | undefined>
+  set(toolName: string, decision: PermissionDecision): Promise<void>
+}
+
 export interface SandboxExecutor {
   execute(command: string, options: Record<string, unknown>, signal: AbortSignal): Promise<{ stdout: string; stderr: string; exitCode: number }>
 }
