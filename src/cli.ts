@@ -1,5 +1,4 @@
 import path from 'node:path'
-import { pathToFileURL } from 'node:url'
 import type { AgentRuntime } from './core/types.ts'
 import { createHarnessContextFromFile } from './dsh/bootstrap.ts'
 
@@ -46,7 +45,7 @@ export async function main(args = process.argv.slice(2)): Promise<void> {
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (process.argv[1] && path.basename(process.argv[1]).toLowerCase() === 'cli.js') {
   main().catch((error: unknown) => {
     console.error(error instanceof Error ? error.message : String(error))
     process.exitCode = 1
