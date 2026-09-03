@@ -46,11 +46,11 @@ CLI / SDK / RPC
 
 ## 当前阶段
 
-阶段二：DSH Service/Fiber 装配、核心依赖固定、Loader/Schema、Include/YAML、CLI、可安装 tarball、Tool Registry/Permission Policy、Concurrency Gate，以及 Approval/Sandbox 最小契约已完成；下一步实现受控的写文件和 Shell 工具。
+阶段二：DSH Service/Fiber 装配、核心依赖固定、Loader/Schema、Include/YAML、CLI、可安装 tarball、Tool Registry/Permission Policy、Concurrency Gate、Approval/Sandbox 契约，以及受控写文件和 Shell 工具已完成；下一步将危险工具接入可配置插件装配。
 
 ## 下一步唯一任务
 
-实现 `write_file` 和 `shell` 两个受控工具：接入 ApprovalPolicy、SandboxExecutor、输出截断和 `exclusive` 执行模式。
+将 `write_file`、`shell`、ApprovalSurface 和 SandboxExecutor 接入 Harness Plugin 配置，并覆盖审批超时、取消与失败回滚。
 
 ## 当前不处理
 
@@ -110,3 +110,4 @@ DEEPSEEK_BASE_URL（可选）
 | 2026-09-03 | 增加 Tool Registry 与 Permission Policy | 将工具查找、权限拒绝和执行异常统一放在 Loop 之外，保留后续替换 Registry/Policy 的边界 |
 | 2026-09-03 | 增加 Concurrency Gate | 独立只读工具并行执行，顺序敏感工具串行执行，降低延迟并保留安全边界 |
 | 2026-09-03 | 增加 Approval/Sandbox 最小契约 | 为危险工具预留可替换的审批和沙箱边界，并让 exclusive 工具进入串行屏障 |
+| 2026-09-03 | 增加受控写文件与 Shell 工具 | 将危险能力限制在 workspace、SandboxExecutor 和 exclusive 执行边界内，并保留默认只读启动行为 |
