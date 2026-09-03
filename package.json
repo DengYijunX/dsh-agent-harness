@@ -18,6 +18,7 @@
   "type": "module",
   "scripts": {
     "test": "vitest run",
+    "test:real": "vitest run test/real-chain.integration.test.ts",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "build": "tsc -p tsconfig.build.json",
