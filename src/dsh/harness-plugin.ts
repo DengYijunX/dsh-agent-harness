@@ -1,5 +1,5 @@
 import type { Context } from '@deepseek-ai/cordis'
-import type { AgentEvent, AgentRuntime, AgentTool, ModelAdapter, PermissionPolicy, SandboxExecutor, SessionStore } from '../core/types.ts'
+import type { AgentEvent, AgentRuntime, AgentTool, ApprovalStore, ApprovalSurface, ModelAdapter, PermissionPolicy, SandboxExecutor, SessionStore } from '../core/types.ts'
 import { runAgentTurn } from '../loop/agent-loop.ts'
 import { DeepSeekModel } from '../model/deepseek-model.ts'
 import { JsonlSession } from '../session/jsonl-session.ts'
@@ -8,6 +8,7 @@ import { ToolRegistry } from '../tools/tool-registry.ts'
 import { ShellTool } from '../tools/shell-tool.ts'
 import { WriteFileTool } from '../tools/write-file-tool.ts'
 import { LocalSandboxExecutor } from '../security/local-sandbox.ts'
+import { StoredApprovalPolicy } from '../security/approval-store.ts'
 
 export interface HarnessPluginConfig {
   model?: ModelAdapter
@@ -15,6 +16,8 @@ export interface HarnessPluginConfig {
   tools?: AgentTool[]
   registry?: ToolRegistry
   permission?: PermissionPolicy
+  approvalSurface?: ApprovalSurface
+  approvalStore?: ApprovalStore
   sandbox?: SandboxExecutor
   enableWriteFile?: boolean
   enableShell?: boolean
@@ -77,7 +80,10 @@ export function HarnessPlugin(ctx: Context, config: HarnessPluginConfig = {}): v
   const defaultPermission: PermissionPolicy = {
     check: async (_call, tool) => tool.name === 'read_file' ? { allowed: true } : { allowed: false, reason: 'approval required' },
   }
-  const registry = config.registry ?? new ToolRegistry(tools, config.permission ?? defaultPermission)
+  const rememberedPermission = config.approvalSurface && config.approvalStore
+    ? new StoredApprovalPolicy(config.approvalSurface, config.approvalStore)
+    : undefined
+  const registry = config.registry ?? new ToolRegistry(tools, config.permission ?? rememberedPermission ?? defaultPermission)
   const runtime = new HarnessRuntime(model, session, tools, registry)
 
   ctx.provide('harnessModel', model)

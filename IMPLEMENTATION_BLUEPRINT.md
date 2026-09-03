@@ -46,11 +46,11 @@ CLI / SDK / RPC
 
 ## 当前阶段
 
-阶段二：DSH Service/Fiber 装配、核心依赖固定、Loader/Schema、Include/YAML、CLI、可安装 tarball、Tool Registry/Permission Policy、Concurrency Gate、Approval/Sandbox 契约、受控写文件和 Shell 工具、可配置危险工具装配，以及审批记忆和本地沙箱限制已完成；下一步接入交互式审批界面。
+阶段二：DSH Service/Fiber 装配、核心依赖固定、Loader/Schema、Include/YAML、CLI、可安装 tarball、Tool Registry/Permission Policy、Concurrency Gate、Approval/Sandbox 契约、受控写文件和 Shell 工具、可配置危险工具装配、审批记忆和本地沙箱限制，以及 ApprovalSurface/JSONL 审批装配已完成；下一步补齐审批超时与真实沙箱回收测试。
 
 ## 下一步唯一任务
 
-实现 CLI/SDK 可注入的交互式 ApprovalSurface，并将审批结果接入 Session 或独立 JSONL 存储；补充真实 Sandbox 超时与取消测试。
+增加 scope 化审批、审批超时/取消语义，并为 LocalSandboxExecutor 增加真实超时和子进程回收测试。
 
 ## 当前不处理
 
@@ -113,3 +113,4 @@ DEEPSEEK_BASE_URL（可选）
 | 2026-09-03 | 增加受控写文件与 Shell 工具 | 将危险能力限制在 workspace、SandboxExecutor 和 exclusive 执行边界内，并保留默认只读启动行为 |
 | 2026-09-03 | 增加可配置危险工具装配 | 通过 DSH 配置选择性启用 write_file/shell，默认拒绝危险执行，并保留权限和沙箱注入点 |
 | 2026-09-03 | 增加审批记忆与沙箱限制 | 复用审批决策，限制本地命令环境并支持超时和进程取消回收 |
+| 2026-09-03 | 接入 ApprovalSurface 与 JSONL 审批存储 | 让 CLI/SDK 可注入审批回调，并让审批决策跨进程实例恢复 |

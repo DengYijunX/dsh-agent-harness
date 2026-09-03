@@ -5,6 +5,8 @@ import { FakeModel } from '../src/model/fake-model.ts'
 import { MemorySession } from '../src/session/memory-session.ts'
 import { ReadonlyFileTool } from '../src/tools/readonly-file-tool.ts'
 import type { SandboxExecutor } from '../src/core/types.ts'
+import { CallbackApprovalSurface } from '../src/security/approval-surface.ts'
+import { MemoryApprovalStore } from '../src/security/approval-store.ts'
 
 describe('HarnessPlugin', () => {
   it('assembles core services and removes them with the owning fiber', async () => {
@@ -47,6 +49,26 @@ describe('HarnessPlugin', () => {
       expect.objectContaining({ name: 'shell', executionMode: 'exclusive' }),
     ]))
     expect(ctx.get('harnessTools')).toHaveLength(3)
+    await fiber.dispose()
+  })
+
+  it('wires approval surface and store into the assembled runtime', async () => {
+    const ctx = new Context()
+    const session = new MemorySession()
+    const fiber = await ctx.plugin(HarnessPlugin, {
+      model: new FakeModel([
+        { type: 'tool_call', id: 'write-1', name: 'write_file', arguments: { path: 'approval-test.txt', content: 'blocked' } },
+        { type: 'text_delta', text: 'not approved' },
+        { type: 'turn_end' },
+      ]),
+      session,
+      enableWriteFile: true,
+      approvalSurface: new CallbackApprovalSurface(async () => ({ allowed: false, reason: 'user denied' })),
+      approvalStore: new MemoryApprovalStore(),
+    })
+
+    await ctx.get('harnessRuntime')?.prompt('Write a file.')
+    expect(await session.read()).toContainEqual(expect.objectContaining({ type: 'tool_result', content: 'user denied', isError: true }))
     await fiber.dispose()
   })
 })
