@@ -46,11 +46,11 @@ CLI / SDK / RPC
 
 ## 当前阶段
 
-阶段一：核心真实链路、DSH Service/Fiber 装配和核心依赖固定已完成；下一步增加 Loader/配置 Schema。
+阶段一：核心真实链路、DSH Service/Fiber 装配、核心依赖固定和 Loader/Schema 已完成；下一步接入 Include/YAML 配置。
 
 ## 下一步唯一任务
 
-增加 DSH Loader 配置入口和 Schema：启动时校验模型、会话路径、工作区及工具配置，配置失败不发布 Agent。
+接入 Include/YAML 文件配置：用 Loader 加载项目配置，复用 Schema 校验，并在失败时回滚整个插件树。
 
 ## 当前不处理
 
@@ -100,3 +100,4 @@ DEEPSEEK_BASE_URL（可选）
 | 2026-09-03 | 完成真实 DeepSeek 端到端 smoke test | 验证模型、工具、事件日志和最终回答可以真实连通 |
 | 2026-09-03 | 增加 DSH Cordis Plugin 装配层 | 让核心服务由 Context/Fiber 统一注册和销毁 |
 | 2026-09-03 | Vendoring Cordis 与 Cosmokit | 固定 DSH 核心运行时，降低上游预览版变动风险 |
+| 2026-09-03 | 增加 Loader/Schema Bootstrap | 固定启动顺序，并在发布 Agent 前完成配置校验 |
