@@ -46,7 +46,7 @@ CLI / SDK / RPC
 
 ## 当前阶段
 
-阶段二已完成：DSH Service/Fiber 装配、核心依赖固定、Loader/Schema、Include/YAML、CLI、可安装 tarball、Tool Registry/Permission Policy、Concurrency Gate、Approval/Sandbox、受控写文件和 Shell、可配置危险工具、审批记忆、JSONL 审批、审批 Scope、真实沙箱测试、结构化审计事件、Context Projection、Session Resume、真实 DeepSeek 链路和测试分类均已具备；下一步补齐 token 级预算、摘要生成和损坏事件恢复，并在前端阶段加入 Chrome CDP。
+阶段二已完成：DSH Service/Fiber 装配、核心依赖固定、Loader/Schema、Include/YAML、CLI、可安装 tarball、Tool Registry/Permission Policy、Concurrency Gate、Approval/Sandbox、受控写文件和 Shell、可配置危险工具、审批记忆、JSONL 审批、审批 Scope、真实沙箱测试、结构化审计事件、Context Projection、Session Resume、真实 DeepSeek 主链路、真实工具治理链路和测试分类均已具备；下一步补齐 token 级预算、摘要生成和损坏事件恢复，并在前端阶段加入 Chrome CDP。
 
 ## 下一步唯一任务
 
@@ -121,3 +121,4 @@ DEEPSEEK_BASE_URL（可选）
 | 2026-09-03 | 增加真实 DeepSeek 链路测试入口 | 用真实 API、文件系统和 JSONL 验证最小链路，并提供保留 Session 产物的查看开关 |
 | 2026-09-04 | 分类确定性测试与真实实测 | 分离无网络边界验证、真实 DeepSeek 链路和未来 Chrome CDP 前端链路，避免混淆验收结论 |
 | 2026-09-04 | 记录真实实测过程 | 记录 workspace 夹具失败、修复、真实 Tool Call、文件读取、JSONL 写入和最终回答的完整证据链 |
+| 2026-09-04 | 增加真实工具治理实测 | 用真实 DeepSeek 触发 write_file，验证权限拒绝发生在文件系统写入之前，并修正测试分类入口 |
